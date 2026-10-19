@@ -10,7 +10,7 @@
 /* Page de réservation DANRISE : nuit et or pour l'identité, module blanc pour le choix du créneau (comme les écrans du logiciel). */
 :root{
  --nuit:#06162b;--nuit2:#0b2540;--nuit3:#123a6b;--or:#c8a96a;--or2:#e9d29a;--or3:#f3e2b3;
- --encre:#0b2245;--gris:#56617a;--gris2:#7a8499;--gris3:#9aa3b6;--trait:#e6e9f1;--papier:#ffffff;--doux:#f4f6fb;
+ --encre:#0b2245;--gris:#56617a;--gris2:#636d82;--gris3:#6b7488;--trait:#e6e9f1;--papier:#ffffff;--doux:#f4f6fb;
  --ok:#1f8a5f;--okf:#e6f5ec;--err:#b13b3b;--errf:#fbeceb;
  --f:Poppins,"Segoe UI",system-ui,-apple-system,sans-serif;
  color-scheme:dark;
@@ -115,7 +115,7 @@ form{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .liste div{display:grid;grid-template-columns:110px minmax(0,1fr);gap:10px;padding:12px 16px;border-top:1px solid var(--trait);font-size:14.5px}
 .liste div:first-child{border-top:0}
 .liste dt,.liste span{color:var(--gris2)}
-.liste b{font-weight:600;overflow-wrap:anywhere}
+.liste b,.liste dd{margin:0;font-weight:600;overflow-wrap:anywhere}
 .liste a{color:#8a6d33;font-weight:600;overflow-wrap:anywhere}
 .actions{display:flex;flex-wrap:wrap;gap:10px}
 .confirme-annul{display:flex;flex-direction:column;gap:10px;width:100%;max-width:520px;padding:16px;border-radius:16px;background:var(--errf)}
@@ -151,10 +151,10 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   <div class="types" id="types" role="group" aria-label="Type de rendez-vous"></div>
   <h1 id="titre">Démonstration DANRISE</h1>
   <ul class="meta">
-   <li><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span id="duree">30 minutes</span></li>
-   <li><svg viewBox="0 0 24 24"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3"/></svg><span>Visio Google Meet, lien envoyé à la confirmation</span></li>
-   <li><svg viewBox="0 0 24 24"><path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4zM10 20a2 2 0 0 0 4 0"/></svg><span>Rappel par e-mail la veille et une heure avant</span></li>
-   <li><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg><span>Heure de Paris</span></li>
+   <li><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span id="duree">30 minutes</span></li>
+   <li><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3"/></svg><span>Visio Google Meet, lien envoyé à la confirmation</span></li>
+   <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4zM10 20a2 2 0 0 0 4 0"/></svg><span>Rappel par e-mail la veille et une heure avant</span></li>
+   <li><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg><span>Heure de Paris</span></li>
   </ul>
   <p class="resume" id="resume"></p>
   <p class="sig">Ne subissez plus. Pilotez votre business.</p>
@@ -168,9 +168,9 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
    <div class="alerte info" id="deplace" hidden></div>
    <div class="choix sans" id="choix" style="margin-top:18px">
     <div>
-     <div class="calh"><b id="mois">…</b><div class="nav"><button type="button" id="prec" aria-label="Mois précédent"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button><button type="button" id="suiv" aria-label="Mois suivant"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button></div></div>
+     <div class="calh"><b id="mois">…</b><div class="nav"><button type="button" id="prec" aria-label="Mois précédent"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><button type="button" id="suiv" aria-label="Mois suivant"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></div></div>
      <div class="grille" id="grille"></div>
-     <p class="fuseau"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg><span id="fuseauTxt">Heure de Paris (France)</span></p>
+     <p class="fuseau"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg><span id="fuseauTxt">Heure de Paris (France)</span></p>
      <p class="alt-rappel">Aucun créneau ne vous convient ? <button type="button" class="lien" id="versRappel">Demander à être rappelé</button></p>
     </div>
     <div class="creneaux" id="creneaux" hidden></div>
@@ -178,7 +178,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   </section>
 
   <section class="vue" id="v-form" hidden>
-   <button type="button" class="retour" id="retour"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Changer de créneau</button>
+   <button type="button" class="retour" id="retour"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>Changer de créneau</button>
    <h2 style="margin-top:6px">Vos coordonnées</h2>
    <div class="recap" id="recap" style="margin:14px 0 18px"></div>
    <form id="form" novalidate>
@@ -196,7 +196,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   </section>
 
   <section class="vue" id="v-rappel" hidden>
-   <button type="button" class="retour" id="retourRappel"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Choisir plutôt un créneau</button>
+   <button type="button" class="retour" id="retourRappel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>Choisir plutôt un créneau</button>
    <h2 style="margin-top:6px">Être rappelé</h2>
    <p style="margin:6px 0 18px;color:var(--gris);max-width:36em">Laissez votre numéro : Jamel Benaouidha vous rappelle au moment qui vous arrange. Vous recevez une confirmation par e-mail.</p>
    <form id="formRappel" novalidate>
@@ -214,7 +214,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 
   <section class="vue" id="v-ok" hidden>
    <div class="ok">
-    <span class="coche"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+    <span class="coche"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
     <h2 id="okTitre">C’est confirmé</h2>
     <p id="okTxt"></p>
     <dl class="liste" id="okListe"></dl>
@@ -336,10 +336,10 @@ function rendCreneaux(){
 function mois(n){var m=S.m+n,y=S.y;if(m>12){m=1;y++;}if(m<1){m=12;y--;}S.y=y;S.m=m;charger();}
 $('prec').addEventListener('click',function(){mois(-1);});
 $('suiv').addEventListener('click',function(){mois(1);});
-$('grille').addEventListener('click',function(e){var b=e.target.closest('button[data-j]');if(!b)return;S.jour=b.dataset.j;S.cr=null;rendCal(false);rendCreneaux();if(window.innerWidth<=640)$('creneaux').scrollIntoView({behavior:'smooth',block:'start'});});
+$('grille').addEventListener('click',function(e){var b=e.target.closest('button[data-j]');if(!b)return;S.jour=b.dataset.j;S.cr=null;rendCal(false);rendCreneaux();var f=$('grille').querySelector('button.sel');if(f)f.focus({preventScroll:true});if(window.innerWidth<=640)$('creneaux').scrollIntoView({behavior:'smooth',block:'start'});});
 $('creneaux').addEventListener('click',function(e){
  var h=e.target.closest('button[data-c]');
- if(h){S.cr={debut:h.dataset.c,label:h.dataset.l};rendCreneaux();return;}
+ if(h){S.cr={debut:h.dataset.c,label:h.dataset.l};rendCreneaux();var g=$('creneaux').querySelector('.cr.sel .go');if(g)g.focus();return;}
  if(e.target.closest('button[data-suivant]'))versForm();
 });
 
@@ -372,7 +372,7 @@ function confirme(r){
  $('okTxt').textContent='Une invitation Google Agenda et un e-mail de confirmation partent vers '+r.email+'. Vous recevrez un rappel la veille et une heure avant.';
  var l=[['Quand',esc(r.quand)+' (heure de Paris)'],['Durée',r.duree+' minutes'],['Avec','Jamel Benaouidha, fondateur de DANRISE']];
  if(r.meet)l.push(['Visio','<a href="'+esc(r.meet)+'" target="_blank" rel="noopener">'+esc(r.meet.replace(/^https:\/\//,''))+'</a>']);
- $('okListe').innerHTML=l.map(function(x){return '<div><dt>'+x[0]+'</dt><b>'+x[1]+'</b></div>';}).join('');
+ $('okListe').innerHTML=l.map(function(x){return '<div><dt>'+x[0]+'</dt><dd>'+x[1]+'</dd></div>';}).join('');
  $('okActions').innerHTML=(r.meet?'<a class="btn" href="'+esc(r.meet)+'" target="_blank" rel="noopener">Ouvrir le lien de la visio</a>':'')+'<button type="button" class="btn gh" id="encore">Réserver un autre créneau</button>';
  S.remplace=null;S.info=null;$('deplace').hidden=true;
  vue('ok');
@@ -394,7 +394,7 @@ $('formRappel').addEventListener('submit',function(e){
  .then(function(r){
   $('okTitre').textContent='Demande envoyée';
   $('okTxt').textContent='Jamel Benaouidha vous rappelle au '+r.telephone+'. Une confirmation part vers '+r.email+'.';
-  $('okListe').innerHTML='<div><dt>Numéro</dt><b>'+esc(r.telephone)+'</b></div><div><dt>Créneau</dt><b>'+esc(r.creneau)+'</b></div>';
+  $('okListe').innerHTML='<div><dt>Numéro</dt><dd>'+esc(r.telephone)+'</dd></div><div><dt>Créneau</dt><dd>'+esc(r.creneau)+'</dd></div>';
   $('okActions').innerHTML='<button type="button" class="btn gh" id="encore">Réserver plutôt un créneau</button>';
   f.reset();b.disabled=false;b.textContent='Demander un rappel';vue('ok');
  })
@@ -404,14 +404,14 @@ $('formRappel').addEventListener('submit',function(e){
 /* ---------- gestion d'un rendez-vous (lien reçu par e-mail) ---------- */
 function gestion(){
  vue('gestion');$('gTitre').textContent='Votre rendez-vous';$('gTxt').textContent='Chargement…';
- api('rdvInfo',PARAMS.rdv,PARAMS.t).then(function(i){
+ (PARAMS.stop?api('rdvStop',PARAMS.rdv,PARAMS.t):Promise.resolve()).then(function(){return api('rdvInfo',PARAMS.rdv,PARAMS.t);}).then(function(i){
   S.info=i;
   var actif=i.statut==='confirmé'&&!i.passe;
-  $('gTitre').textContent=actif?i.titre:(i.passe?'Ce rendez-vous est passé':'Ce rendez-vous n’est plus actif');
-  $('gTxt').textContent=actif?'Besoin de changer ? Choisissez un autre créneau ou annulez en un clic.':'Statut : '+i.statut+'. Vous pouvez réserver un nouveau créneau.';
+  $('gTitre').textContent=PARAMS.stop?'Rappels désactivés':(actif?i.titre:(i.passe?'Ce rendez-vous est passé':'Ce rendez-vous n’est plus actif'));
+  $('gTxt').textContent=PARAMS.stop?'C’est noté : vous ne recevrez plus aucun rappel pour ce rendez-vous.'+(actif?' Le rendez-vous reste prévu ; vous pouvez aussi le déplacer ou l’annuler.':''):(actif?'Besoin de changer ? Choisissez un autre créneau ou annulez en un clic.':'Statut : '+i.statut+'. Vous pouvez réserver un nouveau créneau.');
   var l=[['Quand',esc(i.quand)+' (heure de Paris)'],['Durée',i.duree+' minutes'],['Au nom de',esc(i.nom)]];
   if(actif&&i.meet)l.push(['Visio','<a href="'+esc(i.meet)+'" target="_blank" rel="noopener">'+esc(i.meet.replace(/^https:\/\//,''))+'</a>']);
-  $('gListe').innerHTML=l.map(function(x){return '<div><dt>'+x[0]+'</dt><b>'+x[1]+'</b></div>';}).join('');
+  $('gListe').innerHTML=l.map(function(x){return '<div><dt>'+x[0]+'</dt><dd>'+x[1]+'</dd></div>';}).join('');
   $('gActions').innerHTML=actif?'<button type="button" class="btn" id="gDeplacer">Choisir un autre créneau</button><button type="button" class="btn gh" id="gAnnuler">Annuler le rendez-vous</button>':'<button type="button" class="btn" id="gNouveau">Réserver un créneau</button>';
  }).catch(function(e){$('gTitre').textContent='Lien non reconnu';$('gTxt').textContent=e.message;$('gActions').innerHTML='<button type="button" class="btn" id="gNouveau">Réserver un créneau</button>';});
 }
