@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Réserver un rendez-vous · DANRISE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap">
+<style>
+/* Page de réservation DANRISE : nuit et or pour l'identité, module blanc pour le choix du créneau (comme les écrans du logiciel). */
+:root{
+ --nuit:#06162b;--nuit2:#0b2540;--nuit3:#123a6b;--or:#c8a96a;--or2:#e9d29a;--or3:#f3e2b3;
+ --encre:#0b2245;--gris:#56617a;--gris2:#7a8499;--gris3:#9aa3b6;--trait:#e6e9f1;--papier:#ffffff;--doux:#f4f6fb;
+ --ok:#1f8a5f;--okf:#e6f5ec;--err:#b13b3b;--errf:#fbeceb;
+ --f:Poppins,"Segoe UI",system-ui,-apple-system,sans-serif;
+ color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{min-height:100vh;font-family:var(--f);font-size:15px;line-height:1.5;color:#fff;background:var(--nuit) radial-gradient(110% 70% at 80% -10%,#123a6b 0,#0b2540 45%,#06162b 80%) fixed;padding:28px max(16px,env(safe-area-inset-right,0px)) 28px max(16px,env(safe-area-inset-left,0px))}
+button,input,select,textarea{font:inherit}
+.shell{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);border-radius:26px;overflow:hidden;box-shadow:0 0 0 1.5px rgba(200,169,106,.85),0 0 0 8px rgba(200,169,106,.08),0 60px 110px -50px rgba(0,0,0,.9)}
+/* colonne hôte */
+.hote{display:flex;flex-direction:column;gap:22px;padding:30px 28px;background:linear-gradient(170deg,#0f2e52,#0b2540 55%,#081d36);border-right:1px solid rgba(233,210,154,.25);min-width:0}
+.brand{display:flex;align-items:center;gap:10px}
+.brand svg.m{width:46px;height:42px;fill:url(#sygold)}
+.brand .bt{display:flex;flex-direction:column;gap:4px}
+.brand svg.w{width:116px;height:22px;fill:url(#sygold);--sy-y:#dcc088}
+.brand small{font-size:8.5px;font-weight:700;letter-spacing:.08em;color:#fff}
+.pers{display:flex;align-items:center;gap:13px;padding-top:20px;border-top:1px solid rgba(233,210,154,.2)}
+.pers img{width:54px;height:54px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px var(--nuit2),0 0 0 3.5px var(--or)}
+.pers b{display:block;font-size:15.5px;font-weight:600}
+.pers span{display:block;font-size:12.5px;color:#b9c8dc}
+.types{display:flex;flex-wrap:wrap;gap:6px}
+.types button{border:0;cursor:pointer;font-size:12.5px;font-weight:600;color:#b9c8dc;background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px rgba(233,210,154,.3);padding:7px 13px;border-radius:99px}
+.types button[aria-pressed="true"]{color:var(--nuit);background:linear-gradient(135deg,var(--or3),var(--or));box-shadow:none}
+.hote h1{margin:0;font-size:26px;line-height:1.15;font-weight:700;letter-spacing:-.01em;text-wrap:balance}
+.meta{list-style:none;margin:0;padding:0;display:grid;gap:11px}
+.meta li{display:flex;align-items:flex-start;gap:11px;font-size:14px;color:#dfe6ef}
+.meta svg{flex:none;width:20px;height:20px;margin-top:1px;fill:none;stroke:var(--or2);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.resume{margin:0;font-size:14px;color:#b9c8dc}
+.sig{margin-top:auto;font-size:13px;font-weight:600;color:var(--or2)}
+/* panneau blanc */
+.pan{color-scheme:light;background:var(--papier);color:var(--encre);padding:30px 32px 28px;min-width:0;display:flex;flex-direction:column;gap:18px;min-height:560px}
+.pan h2{margin:0;font-size:20px;font-weight:700;letter-spacing:-.005em}
+.vue[hidden]{display:none!important}
+.alerte{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;font-size:14px;background:var(--errf);color:var(--err)}
+.alerte.info{background:#fdf5e3;color:#7a5a12}
+.alerte[hidden]{display:none}
+.choix{display:grid;grid-template-columns:minmax(0,1fr) 210px;gap:26px;align-items:start}
+.choix.sans{grid-template-columns:minmax(0,1fr)}
+.calh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.calh b{font-size:16px;font-weight:600}
+.nav{display:flex;gap:6px}
+.nav button{width:38px;height:38px;border-radius:50%;border:0;cursor:pointer;display:grid;place-items:center;background:#fbf3df;color:var(--encre)}
+.nav button:disabled{background:none;color:#c9ced9;cursor:default}
+.nav svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.grille{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;text-align:center}
+.grille .jn{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--gris2);padding:4px 0 6px;text-transform:uppercase}
+.jour{position:relative;aspect-ratio:1;max-width:100%;border:0;border-radius:50%;background:none;color:var(--gris3);font-size:15px;font-variant-numeric:tabular-nums;display:grid;place-items:center;cursor:default}
+.jour.dispo{background:#fbf3df;color:var(--encre);font-weight:700;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(200,169,106,.55)}
+.jour.dispo:hover{background:#f6e6bd}
+.jour.sel{background:var(--encre);color:var(--or2);box-shadow:none}
+.jour.auj:after{content:"";position:absolute;bottom:14%;left:50%;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:currentColor}
+.jour.vide{visibility:hidden}
+.chargement .jour{color:transparent;background:linear-gradient(90deg,#f1f3f8 25%,#e7eaf1 50%,#f1f3f8 75%);background-size:200% 100%;animation:shim 1.2s linear infinite}
+.chargement .jour.vide{visibility:hidden}
+@keyframes shim{to{background-position:-200% 0}}
+.fuseau{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:13px;color:var(--gris)}
+.fuseau svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7}
+.creneaux{display:flex;flex-direction:column;gap:8px;max-height:430px;overflow-y:auto;padding:2px 4px 2px 2px}
+.creneaux h3{margin:6px 0 6px;font-size:14.5px;font-weight:600}
+.cr{display:flex;gap:6px}
+.cr button{flex:1;min-height:46px;border-radius:12px;border:0;cursor:pointer;font-weight:700;font-size:15px;font-variant-numeric:tabular-nums;color:var(--encre);background:#fff;box-shadow:inset 0 0 0 1.5px var(--or)}
+.cr button:hover{box-shadow:inset 0 0 0 2px #a8894f}
+.cr.sel .h{background:var(--encre);color:#fff;box-shadow:none}
+.cr .go{display:none;background:linear-gradient(135deg,var(--or3),var(--or));box-shadow:none}
+.cr.sel .go{display:block}
+.vide-msg{font-size:14px;color:var(--gris);padding:10px 0}
+/* formulaire */
+.retour{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;border:0;background:none;cursor:pointer;color:var(--gris);font-weight:600;font-size:14px;padding:4px 0}
+.retour svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.recap{display:flex;flex-wrap:wrap;gap:8px 18px;padding:14px 16px;border-radius:16px;background:var(--doux);box-shadow:inset 0 0 0 1px var(--trait);font-size:14px}
+.recap b{font-weight:700}
+.recap span{display:inline-flex;align-items:center;gap:7px;color:var(--gris)}
+.recap span b{color:var(--encre)}
+form{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ch{display:flex;flex-direction:column;gap:6px;min-width:0}
+.ch.l2{grid-column:1/-1}
+.ch label{font-size:12.5px;font-weight:600;color:var(--gris)}
+.ch label i{font-style:normal;font-weight:400;color:var(--gris3)}
+.ch input,.ch select,.ch textarea{width:100%;border:0;border-radius:12px;padding:12px 14px;font-size:15px;color:var(--encre);background:#fff;box-shadow:inset 0 0 0 1.5px #dfe3ec;outline:0}
+.ch textarea{min-height:84px;resize:vertical}
+.ch input:focus,.ch select:focus,.ch textarea:focus{box-shadow:inset 0 0 0 2px var(--or)}
+.ch input:invalid:not(:placeholder-shown){box-shadow:inset 0 0 0 1.5px #e3a6a6}
+.piege{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.cons{grid-column:1/-1;display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--gris)}
+.cons input{margin-top:3px;width:18px;height:18px;accent-color:#0b2245;flex:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:50px;padding:0 26px;border:0;border-radius:99px;cursor:pointer;font-weight:700;font-size:15.5px;color:var(--nuit);background:linear-gradient(135deg,var(--or3),var(--or));box-shadow:0 14px 28px -16px rgba(168,137,79,.9);text-decoration:none}
+.btn:disabled{opacity:.6;cursor:progress}
+.btn.gh{background:#fff;color:var(--encre);box-shadow:inset 0 0 0 1.5px #d8dde8}
+.btn.danger{background:var(--err);color:#fff;box-shadow:none}
+.envoi{grid-column:1/-1;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.envoi small{font-size:12.5px;color:var(--gris2)}
+/* confirmation et gestion */
+.ok{display:flex;flex-direction:column;align-items:flex-start;gap:16px;padding-top:8px}
+.coche{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;background:var(--okf);color:var(--ok)}
+.coche svg{width:30px;height:30px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.coche.x{background:var(--errf);color:var(--err)}
+.ok h2{font-size:24px}
+.ok p{margin:0;color:var(--gris);max-width:34em}
+.liste{display:grid;gap:0;width:100%;max-width:520px;border-radius:16px;box-shadow:inset 0 0 0 1px var(--trait);overflow:hidden}
+.liste div{display:grid;grid-template-columns:110px minmax(0,1fr);gap:10px;padding:12px 16px;border-top:1px solid var(--trait);font-size:14.5px}
+.liste div:first-child{border-top:0}
+.liste dt,.liste span{color:var(--gris2)}
+.liste b{font-weight:600;overflow-wrap:anywhere}
+.liste a{color:#8a6d33;font-weight:600;overflow-wrap:anywhere}
+.actions{display:flex;flex-wrap:wrap;gap:10px}
+.confirme-annul{display:flex;flex-direction:column;gap:10px;width:100%;max-width:520px;padding:16px;border-radius:16px;background:var(--errf)}
+.confirme-annul[hidden]{display:none}
+.confirme-annul textarea{width:100%;min-height:70px;border:0;border-radius:12px;padding:10px 12px;box-shadow:inset 0 0 0 1.5px #ecc9c9;resize:vertical;color:var(--encre)}
+.pied{max-width:1080px;margin:16px auto 0;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px 18px;font-size:12.5px;color:#8fa3bd}
+.pied b{color:#fff;font-weight:600}
+.spin{width:18px;height:18px;border-radius:50%;border:2.5px solid rgba(6,22,43,.25);border-top-color:var(--nuit);animation:tour .8s linear infinite}
+@keyframes tour{to{transform:rotate(360deg)}}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2.5px solid var(--or);outline-offset:2px}
+@media (max-width:900px){
+ .shell{grid-template-columns:minmax(0,1fr)}
+ .hote{border-right:0;border-bottom:1px solid rgba(233,210,154,.25);gap:16px;padding:24px 22px}
+ .sig{display:none}
+ .pan{padding:24px 20px;min-height:0}
+}
+@media (max-width:640px){
+ body{padding-top:16px;padding-bottom:16px}
+ .choix{grid-template-columns:minmax(0,1fr)}
+ form{grid-template-columns:minmax(0,1fr)}
+ .creneaux{max-height:none}
+ .liste div{grid-template-columns:minmax(0,1fr);gap:2px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="sygold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6e7bd"/><stop offset=".5" stop-color="#dcc088"/><stop offset="1" stop-color="#b8924a"/></linearGradient><g id="sy-mark" transform="translate(0,1710) scale(1,-1)"><path d="M773 1633 c-2 -1 0 -4 5 -8 11 -9 58 -57 73 -75 14 -17 30 -38 38 -49 1 -2 3 -6 5 -7 4 -6 12 -18 12 -19 0 0 1 -2 2 -3 3 -4 9 -14 9 -15 0 0 3 -5 6 -10 3 -5 8 -13 10 -17 4 -10 11 -22 14 -27 4 -6 0 -10 -6 -5 -1 1 -3 2 -4 2 0 0 -2 1 -3 2 -1 1 -4 2 -7 3 -2 0 -4 2 -6 2 -7 5 -48 18 -73 23 -29 6 -101 8 -120 3 -3 -1 -5 -1 -8 0 -8 2 -33 -5 -34 -10 0 -2 -2 -3 -4 -4 -3 0 -6 -2 -7 -4 -2 -1 -4 -3 -6 -3 -2 -1 -4 -2 -5 -3 -2 -1 -7 -4 -13 -7 -13 -7 -17 -9 -25 -14 -3 -3 -7 -5 -8 -6 -2 -1 -3 -3 -3 -3 0 0 -4 -4 -9 -7 -10 -8 -31 -29 -41 -40 -6 -8 -8 -11 -20 -27 -5 -8 -16 -27 -18 -33 -10 -22 -16 -42 -19 -55 -1 -4 -3 -11 -4 -16 -5 -23 -7 -32 -8 -51 -1 -33 -5 -53 -13 -63 -2 -2 -3 -5 -3 -6 -1 -1 -5 -8 -10 -14 -5 -7 -13 -18 -17 -24 -5 -6 -10 -13 -11 -14 -2 -2 -4 -6 -6 -8 -2 -3 -8 -11 -13 -19 -6 -7 -12 -15 -13 -17 -1 -2 -5 -7 -8 -11 -3 -4 -6 -8 -7 -10 -1 -1 -4 -5 -7 -9 -9 -11 -19 -25 -21 -28 -2 -2 -5 -7 -8 -12 -4 -4 -12 -15 -18 -23 -6 -9 -13 -18 -14 -19 -1 -2 -4 -6 -6 -9 -3 -4 -8 -11 -13 -17 -5 -6 -11 -14 -13 -18 -8 -10 -14 -18 -16 -22 -2 -2 -5 -7 -8 -10 -3 -4 -8 -11 -11 -15 -3 -4 -7 -10 -9 -13 -3 -4 -7 -9 -9 -13 -3 -4 -6 -8 -7 -9 -4 -3 -6 -8 -4 -10 2 -1 507 -2 510 0 4 2 4 3 17 27 3 7 8 16 10 20 2 3 6 11 9 17 3 6 6 11 7 12 1 1 7 14 17 34 3 5 6 10 7 11 0 1 2 4 3 6 0 2 2 5 2 6 1 1 5 8 9 16 5 9 9 16 9 17 1 1 3 3 3 6 1 2 5 8 8 14 3 6 8 16 11 22 3 6 7 12 8 14 1 1 3 5 4 8 2 3 5 10 9 16 5 9 9 17 21 42 6 13 11 23 12 29 3 12 5 14 15 12 26 -6 100 -14 134 -15 9 0 18 0 19 0 2 0 5 -4 5 -6 0 -1 1 -4 2 -7 4 -6 8 -16 12 -25 2 -4 5 -11 7 -15 28 -60 28 -67 -4 -68 -11 -1 -16 -1 -20 -3 -6 -2 -9 -3 -14 0 -17 6 -9 33 10 32 9 -1 12 2 6 8 -5 5 -9 6 -17 6 -11 0 -13 -1 -35 -23 -19 -18 -24 -21 -40 -25 -12 -2 -41 2 -50 8 -1 1 -4 3 -6 4 -6 4 -15 10 -22 16 -9 9 -11 9 -16 3 -6 -8 -1 -14 26 -33 10 -7 10 -6 10 -20 1 -5 2 -13 3 -17 1 -4 2 -9 3 -12 2 -10 12 -27 19 -31 6 -5 7 -2 2 8 -3 9 -7 24 -8 40 -3 18 -2 19 9 17 10 -2 10 -3 8 -9 -5 -8 -4 -32 1 -44 12 -29 36 -38 72 -29 10 2 11 1 11 -9 0 -3 1 -11 2 -17 5 -35 -20 -42 -79 -23 -44 14 -82 47 -105 92 -9 17 -11 17 -20 -2 -6 -12 -6 -12 -3 -19 24 -46 70 -85 118 -100 86 -27 129 -5 119 63 -3 19 -2 24 9 35 11 13 14 27 8 44 -3 8 -1 9 15 11 12 1 17 3 25 11 18 16 18 38 2 75 -3 5 -6 13 -8 17 -2 4 -5 12 -8 18 -3 5 -5 11 -6 13 -1 2 -2 5 -3 6 -1 2 -2 5 -3 8 0 5 -1 5 17 6 13 1 28 3 41 5 4 1 13 3 19 4 10 2 21 5 30 9 5 2 7 6 7 12 0 10 -2 13 -29 35 -39 32 -60 52 -78 77 -7 11 -8 11 -22 -3 -8 -7 -8 -9 -4 -14 1 -1 4 -5 6 -8 7 -9 21 -24 34 -36 7 -7 13 -13 13 -13 0 -1 4 -4 10 -9 27 -21 26 -21 9 -24 -18 -2 -24 -3 -39 -4 -9 -1 -23 -2 -31 -2 -46 -4 -133 3 -172 13 -9 2 -10 4 -10 10 0 3 0 8 -1 12 0 8 1 10 11 13 14 4 33 11 46 17 3 2 7 3 8 4 6 1 37 17 50 26 4 2 17 9 26 15 3 2 7 4 9 6 2 2 4 4 6 4 2 1 7 5 13 10 6 4 11 8 13 9 3 2 15 12 23 20 5 3 10 7 11 8 5 4 44 43 55 55 19 21 35 40 51 62 7 10 26 39 28 43 3 4 6 6 9 3 2 -1 6 -4 9 -6 4 -3 8 -7 11 -9 26 -22 26 -22 25 15 -1 13 -1 53 -1 87 -1 71 0 69 -9 65 -11 -6 -17 -9 -18 -9 0 0 -2 -1 -4 -3 -2 -2 -5 -3 -6 -4 -2 0 -3 -1 -4 -2 -2 -2 -6 -4 -9 -4 -1 0 -2 -1 -3 -2 -2 -3 -6 -4 -13 -4 -9 0 -25 -10 -31 -20 -1 -2 -3 -3 -4 -4 -1 -1 -7 -5 -12 -9 -6 -4 -12 -8 -14 -9 -2 -2 -6 -4 -10 -7 -3 -2 -8 -5 -11 -7 -17 -8 -15 -10 14 -20 25 -8 28 -10 22 -19 -2 -2 -3 -5 -4 -7 -1 -3 -4 -8 -10 -17 -1 -2 -4 -7 -6 -11 -2 -4 -4 -7 -5 -7 0 -1 -2 -3 -3 -6 -7 -13 -36 -55 -55 -78 -21 -25 -59 -62 -81 -79 -22 -18 -62 -44 -80 -53 -25 -12 -32 -15 -39 -17 -4 -2 -9 -4 -11 -5 -6 -3 -14 2 -14 8 0 3 -12 19 -23 32 -18 21 -58 46 -85 53 -4 0 -7 2 -8 2 -1 0 -6 2 -12 3 -7 1 -14 3 -16 3 -17 5 -25 1 -32 -16 -1 -2 -2 -5 -3 -6 -2 -2 -4 -5 -4 -7 -1 -2 -4 -6 -6 -10 -3 -3 -6 -8 -7 -11 -2 -2 -5 -7 -7 -9 -1 -3 -5 -10 -9 -15 -6 -12 -10 -19 -15 -26 -2 -3 -3 -5 -3 -5 0 -1 -1 -3 -3 -6 -2 -3 -6 -9 -8 -13 -3 -5 -8 -12 -10 -16 -15 -21 -14 -23 5 -24 27 -2 60 -9 74 -16 1 -1 7 -4 12 -7 10 -4 14 -7 28 -18 26 -20 42 -49 47 -81 3 -28 0 -47 -9 -64 -1 -2 -3 -8 -6 -13 -3 -6 -6 -11 -8 -12 -2 -2 -2 -2 -186 -2 -204 0 -187 1 -193 -11 0 -2 -3 -6 -6 -8 -4 -5 -5 -9 -3 -10 0 -1 84 -1 185 -1 102 0 184 0 185 -1 2 -1 1 -6 -3 -11 -1 -2 -3 -6 -4 -8 -1 -3 -3 -7 -5 -9 -1 -2 -2 -4 -2 -5 0 0 -1 -2 -2 -3 -1 -1 -4 -7 -7 -13 -3 -6 -9 -16 -12 -22 -3 -6 -7 -13 -7 -14 -1 -1 -3 -3 -4 -4 -3 -1 -430 -1 -432 0 -2 2 -1 5 4 10 2 3 5 7 6 9 2 2 6 8 10 14 4 5 12 16 18 24 6 8 12 16 14 18 2 3 5 7 6 10 2 2 7 9 11 14 4 5 8 11 10 14 1 2 7 10 13 17 6 8 12 16 13 18 1 2 3 5 4 6 2 1 6 7 10 13 8 12 10 15 16 22 2 3 5 7 6 9 1 2 3 4 4 5 1 0 75 1 166 1 120 0 166 0 166 1 3 3 -1 22 -6 27 -4 5 -254 4 -261 -1 -11 -6 -18 -8 -31 -7 -17 1 -16 4 5 31 38 49 48 70 51 106 3 42 5 55 11 80 1 4 3 10 4 14 0 4 2 7 2 8 1 0 2 3 3 6 0 3 2 6 2 8 1 1 3 4 4 7 3 7 9 21 14 28 1 3 4 7 5 9 9 17 50 59 68 68 2 2 9 6 15 10 13 7 35 17 43 19 4 1 10 3 32 10 18 6 21 3 5 -6 -4 -2 -10 -6 -14 -9 -3 -2 -6 -4 -6 -4 -1 0 -4 -3 -7 -6 -4 -3 -10 -8 -14 -11 -13 -11 -30 -29 -42 -47 -2 -2 -5 -7 -8 -10 -3 -4 -6 -10 -8 -12 -1 -3 -2 -5 -3 -5 -1 -1 -8 -14 -16 -33 -10 -25 -8 -20 -19 -56 -2 -6 -3 -14 -4 -18 -1 -4 -2 -9 -2 -12 -1 -3 -2 -10 -3 -16 -1 -5 -2 -12 -3 -16 -3 -18 -4 -34 -1 -36 8 -4 16 0 16 8 0 8 3 26 11 70 6 32 23 75 38 99 1 3 3 7 4 8 7 13 32 43 51 60 11 9 20 17 21 17 0 0 2 1 5 3 2 2 9 6 15 10 7 3 15 8 18 10 6 3 28 13 41 17 9 3 24 3 41 -1 5 -1 11 -3 13 -3 8 -1 35 -10 42 -13 3 -2 7 -3 7 -3 5 0 42 -22 55 -32 17 -14 21 -18 34 -46 21 -46 19 -44 33 -32 12 11 12 10 2 30 -2 3 -5 10 -7 14 -2 3 -4 9 -6 12 -2 3 -3 6 -3 7 0 1 -1 3 -2 5 -2 2 -3 5 -4 7 0 1 -3 7 -6 13 -3 6 -6 12 -6 12 0 1 -1 3 -2 6 -2 2 -8 14 -14 26 -19 39 -27 54 -43 81 -14 23 -35 52 -52 73 -4 5 -9 11 -11 14 -3 3 -8 9 -13 14 -12 12 -11 14 4 9 5 -1 11 -3 12 -3 13 -3 43 -22 60 -36 8 -8 10 -9 15 -9 2 0 14 4 17 6 1 1 14 5 17 5 4 0 4 -2 3 -14 -2 -18 1 -46 8 -75 1 -5 3 -12 4 -16 5 -19 10 -38 16 -52 2 -6 6 -14 7 -18 2 -5 4 -12 6 -16 4 -12 9 -23 10 -24 0 -1 1 -3 2 -5 1 -5 4 -12 9 -22 2 -4 4 -8 4 -9 2 -6 7 -3 17 7 10 12 10 8 -2 36 -2 4 -3 7 -3 8 0 1 -3 7 -9 20 0 1 -1 4 -2 6 0 1 -3 8 -6 16 -6 16 -9 24 -16 47 -2 10 -5 20 -6 21 -9 24 -11 75 -3 104 3 15 3 15 -13 17 -17 2 -40 -1 -52 -6 -5 -2 -9 -1 -17 7 -2 1 -14 9 -20 12 -2 2 -5 4 -6 5 -1 0 -4 2 -7 3 -2 1 -5 2 -6 3 -2 1 -28 10 -33 11 -3 0 -5 1 -6 1 -10 5 -87 14 -93 10z m-10 -403 c7 -1 13 -3 14 -3 1 0 7 -3 14 -5 7 -3 13 -6 15 -7 1 -1 4 -2 5 -2 1 -1 5 -3 8 -6 4 -2 8 -6 11 -7 54 -36 69 -116 32 -175 -6 -9 -14 -25 -16 -30 -3 -9 -7 -8 -9 4 -2 8 -14 34 -18 40 -1 1 -2 3 -2 4 0 5 -29 38 -43 47 -25 17 -67 35 -83 35 -7 0 -9 4 -6 9 2 1 5 7 8 12 3 5 6 10 7 12 2 1 12 19 22 37 3 3 6 9 8 12 5 7 7 11 12 19 4 6 5 8 8 8 1 -1 7 -2 13 -4z m275 -302 c3 -9 17 -21 25 -21 2 0 3 -3 4 -12 0 -5 1 -11 2 -13 3 -10 3 -11 -7 -23 -3 -4 -6 -7 -6 -8 0 -2 -4 -5 -7 -5 -1 0 -4 -1 -6 -2 -5 -1 -22 -4 -31 -4 -34 0 -46 59 -14 70 5 1 10 3 12 5 2 1 4 2 4 2 2 0 9 6 14 10 5 5 8 5 10 1z  M934 1033 c-1 0 -5 -7 -5 -10 0 -3 6 -9 16 -14 1 -1 4 -3 6 -5 3 -3 17 -10 29 -15 24 -10 50 -9 69 3 4 2 7 4 8 4 0 0 3 2 5 4 2 2 5 5 7 7 5 3 5 6 1 12 -5 6 -8 6 -14 -1 -21 -22 -55 -23 -89 -3 -18 12 -21 13 -24 16 -2 3 -6 4 -9 2z  M797 763 c-2 -2 -4 -6 -5 -9 -2 -2 -4 -6 -5 -7 -2 -4 -1 -7 6 -12 3 -3 8 -8 11 -10 7 -7 22 -19 25 -21 1 -1 5 -4 10 -7 10 -9 34 -25 46 -33 1 -1 8 -5 14 -9 6 -4 12 -8 14 -9 1 -1 4 -3 6 -4 5 -3 7 -2 14 9 9 13 9 13 -10 24 -6 4 -14 8 -16 10 -2 2 -6 5 -9 6 -2 1 -5 3 -7 5 -2 1 -7 5 -12 8 -5 4 -11 8 -13 9 -11 8 -44 36 -54 45 -10 10 -12 11 -15 5z "/></g><g id="sy-word"><path d="M99.6 1418.7V1209.3H180.4Q213.9 1209.3 238.7 1222.9Q263.5 1236.5 277.5 1260.0Q291.4 1283.5 291.4 1314.0Q291.4 1344.5 277.5 1368.0Q263.5 1391.5 238.7 1405.1Q213.9 1418.7 180.4 1418.7ZM109.8 1409.4H179.8Q210.6 1409.4 233.5 1397.2Q256.4 1384.9 268.8 1363.4Q281.2 1341.8 281.2 1314.0Q281.2 1286.2 268.8 1264.6Q256.4 1243.1 233.5 1230.8Q210.6 1218.6 179.8 1218.6H109.8Z M339.3 1418.7 436.3 1209.3H446.1L543.1 1418.7H532.0L439.0 1216.2H443.5L350.4 1418.7ZM372.8 1357.4 376.7 1348.7H504.8L508.7 1357.4Z M591.0 1418.7V1209.3H599.4L753.2 1406.8H748.1V1209.3H758.3V1418.7H749.9L596.1 1221.2H601.2V1418.7Z"/><path d="M806.3 1418.7V1209.3H896.9Q925.0 1209.3 945.4 1218.4Q965.7 1227.5 976.8 1244.6Q987.9 1261.6 987.9 1285.3Q987.9 1308.6 976.8 1325.5Q965.7 1342.4 945.4 1351.4Q925.0 1360.4 896.9 1360.4H833.2L854.7 1339.1V1418.7ZM939.4 1418.7 887.0 1342.7H938.8L991.8 1418.7ZM854.7 1344.5 833.2 1321.8H894.2Q916.7 1321.8 927.7 1312.1Q938.8 1302.3 938.8 1285.3Q938.8 1267.9 927.7 1258.3Q916.7 1248.8 894.2 1248.8H833.2L854.7 1225.7Z M1039.7 1418.7V1209.3H1088.2V1418.7Z M1221.4 1422.3Q1196.3 1422.3 1173.3 1415.6Q1150.2 1408.8 1136.2 1398.1L1152.6 1361.6Q1166.1 1371.1 1184.5 1377.3Q1202.9 1383.4 1221.7 1383.4Q1236.1 1383.4 1244.9 1380.6Q1253.7 1377.7 1257.9 1372.6Q1262.1 1367.6 1262.1 1361.0Q1262.1 1352.6 1255.5 1347.7Q1249.0 1342.7 1238.2 1339.6Q1227.4 1336.4 1214.4 1333.6Q1201.4 1330.8 1188.4 1326.6Q1175.4 1322.4 1164.6 1315.8Q1153.8 1309.2 1147.1 1298.4Q1140.3 1287.7 1140.3 1270.9Q1140.3 1253.0 1150.1 1238.2Q1159.8 1223.3 1179.4 1214.5Q1199.0 1205.7 1228.6 1205.7Q1248.4 1205.7 1267.5 1210.3Q1286.7 1215.0 1301.3 1224.2L1286.4 1261.0Q1271.7 1252.7 1257.0 1248.6Q1242.4 1244.6 1228.3 1244.6Q1214.2 1244.6 1205.3 1247.9Q1196.3 1251.2 1192.4 1256.4Q1188.5 1261.6 1188.5 1268.5Q1188.5 1276.6 1195.1 1281.5Q1201.7 1286.5 1212.5 1289.5Q1223.2 1292.5 1236.2 1295.4Q1249.3 1298.4 1262.3 1302.3Q1275.3 1306.2 1286.1 1312.8Q1296.8 1319.4 1303.6 1330.2Q1310.3 1340.9 1310.3 1357.4Q1310.3 1375.0 1300.4 1389.7Q1290.5 1404.4 1270.9 1413.3Q1251.3 1422.3 1221.4 1422.3Z M1402.8 1293.7H1503.7V1331.4H1402.8ZM1406.4 1379.8H1520.4V1418.7H1358.3V1209.3H1516.5V1248.2H1406.4Z" style="fill:var(--sy-y,currentColor)"/></g></defs></svg>
+<div class="shell">
+ <aside class="hote">
+  <div class="brand" aria-label="DANRISE, pilotage commercial"><svg class="m" viewBox="230 40 1160 1050" aria-hidden="true"><use href="#sy-mark"/></svg><span class="bt"><svg class="w" viewBox="40 1170 1540 290" aria-hidden="true"><use href="#sy-word"/></svg><small>PILOTAGE COMMERCIAL</small></span></div>
+  <div class="pers"><img src="data:image/jpeg;base64,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" alt="Jamel Benaouidha"><div><b>Jamel Benaouidha</b><span>Fondateur de DANRISE</span></div></div>
+  <div class="types" id="types" role="group" aria-label="Type de rendez-vous"></div>
+  <h1 id="titre">Démonstration DANRISE</h1>
+  <ul class="meta">
+   <li><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span id="duree">30 minutes</span></li>
+   <li><svg viewBox="0 0 24 24"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3"/></svg><span>Visio Google Meet, lien envoyé à la confirmation</span></li>
+   <li><svg viewBox="0 0 24 24"><path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4zM10 20a2 2 0 0 0 4 0"/></svg><span>Rappel par e-mail la veille et une heure avant</span></li>
+   <li><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg><span>Heure de Paris</span></li>
+  </ul>
+  <p class="resume" id="resume"></p>
+  <p class="sig">Ne subissez plus. Pilotez votre business.</p>
+ </aside>
+
+ <main class="pan" aria-live="polite">
+  <div class="alerte" id="alerte" role="alert" hidden></div>
+
+  <section class="vue" id="v-cal">
+   <h2 id="calTitre">Choisissez une date et une heure</h2>
+   <div class="alerte info" id="deplace" hidden></div>
+   <div class="choix sans" id="choix" style="margin-top:18px">
+    <div>
+     <div class="calh"><b id="mois">…</b><div class="nav"><button type="button" id="prec" aria-label="Mois précédent"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button><button type="button" id="suiv" aria-label="Mois suivant"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button></div></div>
+     <div class="grille" id="grille"></div>
+     <p class="fuseau"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg><span id="fuseauTxt">Heure de Paris (France)</span></p>
+    </div>
+    <div class="creneaux" id="creneaux" hidden></div>
+   </div>
+  </section>
+
+  <section class="vue" id="v-form" hidden>
+   <button type="button" class="retour" id="retour"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Changer de créneau</button>
+   <h2 style="margin-top:6px">Vos coordonnées</h2>
+   <div class="recap" id="recap" style="margin:14px 0 18px"></div>
+   <form id="form" novalidate>
+    <div class="ch"><label for="f-nom">Prénom et nom</label><input id="f-nom" name="nom" autocomplete="name" required maxlength="80" placeholder="Camille Martin"></div>
+    <div class="ch"><label for="f-email">E-mail professionnel</label><input id="f-email" name="email" type="email" autocomplete="email" required maxlength="120" placeholder="camille@entreprise.fr"></div>
+    <div class="ch"><label for="f-tel">Téléphone <i>(facultatif)</i></label><input id="f-tel" name="telephone" type="tel" autocomplete="tel" maxlength="30" placeholder="06 12 34 56 78"></div>
+    <div class="ch"><label for="f-soc">Société</label><input id="f-soc" name="societe" autocomplete="organization" maxlength="100" placeholder="Nom de votre entreprise"></div>
+    <div class="ch l2"><label for="f-eff">Combien de commerciaux dans votre équipe ?</label>
+     <select id="f-eff" name="effectif"><option value="">Choisir</option><option>Moi seul</option><option>2 à 5</option><option>6 à 10</option><option>Plus de 10</option></select></div>
+    <div class="ch l2"><label for="f-msg">Ce que vous voulez piloter en priorité <i>(facultatif)</i></label><textarea id="f-msg" name="message" maxlength="1000" placeholder="Exemple : savoir chaque lundi si la semaine tient, mieux préparer les rendez-vous…"></textarea></div>
+    <div class="piege" aria-hidden="true"><label for="f-site">Site</label><input id="f-site" name="site" tabindex="-1" autocomplete="off"></div>
+    <label class="cons"><input id="f-cons" type="checkbox" name="consentement" required><span>J’accepte que ces informations servent à organiser ce rendez-vous et à m’envoyer la confirmation et les rappels. Elles ne sont ni revendues ni utilisées pour autre chose.</span></label>
+    <div class="envoi"><button class="btn" type="submit" id="valider">Confirmer le rendez-vous</button><small>Invitation et lien de visio envoyés par e-mail.</small></div>
+   </form>
+  </section>
+
+  <section class="vue" id="v-ok" hidden>
+   <div class="ok">
+    <span class="coche"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+    <h2 id="okTitre">C’est confirmé</h2>
+    <p id="okTxt"></p>
+    <dl class="liste" id="okListe"></dl>
+    <div class="actions" id="okActions"></div>
+   </div>
+  </section>
+
+  <section class="vue" id="v-gestion" hidden>
+   <div class="ok">
+    <h2 id="gTitre">Votre rendez-vous</h2>
+    <p id="gTxt"></p>
+    <dl class="liste" id="gListe"></dl>
+    <div class="actions" id="gActions"></div>
+    <div class="confirme-annul" id="gAnnul" hidden>
+     <b>Annuler ce rendez-vous ?</b>
+     <label for="g-motif" style="font-size:13px;color:#7a2e2e">Un mot sur la raison <i style="font-style:normal;opacity:.7">(facultatif)</i></label>
+     <textarea id="g-motif" maxlength="500"></textarea>
+     <div class="actions"><button type="button" class="btn danger" id="gOui">Confirmer l’annulation</button><button type="button" class="btn gh" id="gNon">Garder le rendez-vous</button></div>
+    </div>
+   </div>
+  </section>
+ </main>
+</div>
+<div class="pied"><span><b>DANRISE</b> by Grow Up Coaching</span><span>Vos informations servent uniquement à organiser ce rendez-vous.</span></div>
+
+<script>
+(function(){
+'use strict';
+var PARAMS=/*PARAMS*/null;
+var API_URL=/*API*/"https://script.google.com/macros/s/AKfycbz0TLB5YE14mr_sqGTcE7lMXc92O8Fekz8oLWM_GHcz2dfXQPJ3Xc7dod6EofavWg9wTA/exec";
+if(!PARAMS){PARAMS={};try{new URLSearchParams(location.search).forEach(function(v,k){PARAMS[k]=v;});}catch(e){}}
+var GAS=typeof google!=='undefined'&&google.script&&google.script.run;
+function api(fn){
+ var args=[].slice.call(arguments,1);
+ if(GAS) return new Promise(function(res,rej){var r=google.script.run.withSuccessHandler(res).withFailureHandler(function(e){rej(new Error(nettoie(e&&e.message)));});r[fn].apply(r,args);});
+ return fetch(API_URL,{method:'POST',credentials:'omit',body:JSON.stringify({fn:fn,args:args})}).then(function(r){return r.json();}).then(function(j){if(!j.ok){var e=new Error(j.erreur||'Erreur');e.code=j.code;throw e;}return j.data;});
+}
+function nettoie(m){return String(m||'Erreur').replace(/^(Error|Exception|Erreur)\s*:\s*/i,'');}
+var $=function(id){return document.getElementById(id);};
+var JOURS=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+var MOIS=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+var S={cfg:null,type:null,y:0,m:0,cache:{},jour:null,cr:null,remplace:null,info:null,auto:true};
+
+function pad(n){return (n<10?'0':'')+n;}
+function iso(y,m,d){return y+'-'+pad(m)+'-'+pad(d);}
+function parts(s){return s.split('-').map(Number);}
+function dow(s){var p=parts(s);return new Date(Date.UTC(p[0],p[1]-1,p[2])).getUTCDay();}
+function plus(s,n){var p=parts(s);var d=new Date(Date.UTC(p[0],p[1]-1,p[2]+n));return iso(d.getUTCFullYear(),d.getUTCMonth()+1,d.getUTCDate());}
+function nbJours(y,m){return new Date(Date.UTC(y,m,0)).getUTCDate();}
+function libJour(s){var p=parts(s);return JOURS[dow(s)]+' '+p[2]+' '+MOIS[p[1]-1];}
+function typeCfg(){return S.cfg.types.filter(function(t){return t.id===S.type;})[0]||S.cfg.types[0];}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function alerte(msg,info){var a=$('alerte');if(!msg){a.hidden=true;return;}a.className='alerte'+(info?' info':'');a.textContent=msg;a.hidden=false;}
+function vue(n){['cal','form','ok','gestion'].forEach(function(v){$('v-'+v).hidden=v!==n;});window.scrollTo&&window.scrollTo(0,0);}
+
+function rendHote(){
+ var t=typeCfg();
+ $('titre').textContent=t.titre;$('duree').textContent=t.duree+' minutes';$('resume').textContent=t.resume;
+ var box=$('types');
+ if(S.cfg.types.length<2||S.remplace){box.hidden=true;return;}
+ box.hidden=false;
+ box.innerHTML=S.cfg.types.map(function(x){return '<button type="button" data-t="'+x.id+'" aria-pressed="'+(x.id===S.type)+'">'+esc(x.titre)+' · '+x.duree+' min</button>';}).join('');
+}
+$('types').addEventListener('click',function(e){var b=e.target.closest('button[data-t]');if(!b||b.dataset.t===S.type)return;S.type=b.dataset.t;S.jour=null;S.cr=null;S.auto=true;rendHote();vue('cal');charger();});
+
+/* ---------- calendrier ---------- */
+function cle(){return S.type+'|'+S.y+'-'+pad(S.m);}
+function limite(){return plus(S.cfg.aujourdhui,S.cfg.horizonJours);}
+function charger(){
+ var k=cle();
+ rendCal(true);
+ if(S.cache[k]){apres();return;}
+ var debut=iso(S.y,S.m,1);if(debut<S.cfg.aujourdhui)debut=S.cfg.aujourdhui;
+ var fin=iso(S.y,S.m,nbJours(S.y,S.m));
+ var n=Math.round((Date.UTC.apply(null,[parts(fin)[0],parts(fin)[1]-1,parts(fin)[2]])-Date.UTC(parts(debut)[0],parts(debut)[1]-1,parts(debut)[2]))/864e5)+1;
+ if(debut>limite()){S.cache[k]={};apres();return;}
+ api('rdvCreneaux',S.type,debut,n).then(function(r){S.cache[k]=r.jours||{};if(cle()===k)apres();prechargeSuivant();})
+  .catch(function(e){alerte(e.message);rendCal(false);});
+}
+function prechargeSuivant(){
+ var y=S.m===12?S.y+1:S.y,m=S.m===12?1:S.m+1,k=S.type+'|'+y+'-'+pad(m),d=iso(y,m,1);
+ if(S.cache[k]||d>limite())return;
+ api('rdvCreneaux',S.type,d,nbJours(y,m)).then(function(r){S.cache[k]=r.jours||{};}).catch(function(){});
+}
+function apres(){
+ var j=S.cache[cle()]||{},dispo=Object.keys(j).sort();
+ if(S.auto){
+  if(PARAMS.date&&j[PARAMS.date])S.jour=PARAMS.date;
+  else if(!S.jour||!j[S.jour])S.jour=dispo[0]||null;
+  if(!dispo.length&&iso(S.y,S.m,1)<limite()&&S.autoMois!==cle()){S.autoMois=cle();S.auto=true;mois(1);return;}
+  S.auto=false;
+ }
+ rendCal(false);rendCreneaux();
+}
+function rendCal(load){
+ var t=new Date(Date.UTC(S.y,S.m-1,1));
+ $('mois').textContent=cap(MOIS[S.m-1])+' '+S.y;
+ var j=load?{}:(S.cache[cle()]||{});
+ var premier=(dow(iso(S.y,S.m,1))+6)%7,html=['lun.','mar.','mer.','jeu.','ven.','sam.','dim.'].map(function(x){return '<span class="jn">'+x+'</span>';}).join('');
+ for(var i=0;i<premier;i++)html+='<span class="jour vide"></span>';
+ for(var d=1;d<=nbJours(S.y,S.m);d++){
+  var s=iso(S.y,S.m,d),ok=!!j[s],c='jour'+(ok?' dispo':'')+(s===S.jour&&ok?' sel':'')+(s===S.cfg.aujourdhui?' auj':'');
+  html+=ok?'<button type="button" class="'+c+'" data-j="'+s+'" aria-label="'+libJour(s)+', '+j[s].length+' créneaux" aria-pressed="'+(s===S.jour)+'">'+d+'</button>':'<span class="'+c+'" aria-hidden="true">'+d+'</span>';
+ }
+ $('grille').innerHTML=html;$('grille').classList.toggle('chargement',!!load);
+ var mo=iso(S.y,S.m,1);
+ $('prec').disabled=mo<=S.cfg.aujourdhui.slice(0,8)+'01';
+ $('suiv').disabled=plus(iso(S.y,S.m,nbJours(S.y,S.m)),1)>limite();
+}
+function rendCreneaux(){
+ var box=$('creneaux'),j=S.cache[cle()]||{};
+ var liste=S.jour&&j[S.jour];
+ if(!Object.keys(j).length){box.hidden=false;$('choix').classList.remove('sans');box.innerHTML='<p class="vide-msg">Aucun créneau libre ce mois-ci. Passez au mois suivant.</p>';return;}
+ if(!liste){box.hidden=true;$('choix').classList.add('sans');return;}
+ $('choix').classList.remove('sans');box.hidden=false;
+ box.innerHTML='<h3>'+cap(libJour(S.jour))+'</h3>'+liste.map(function(c){var sel=S.cr&&S.cr.debut===c.debut;return '<div class="cr'+(sel?' sel':'')+'"><button type="button" class="h" data-c="'+c.debut+'" data-l="'+c.label+'">'+c.label+'</button><button type="button" class="go" data-suivant="1">Suivant</button></div>';}).join('');
+}
+function mois(n){var m=S.m+n,y=S.y;if(m>12){m=1;y++;}if(m<1){m=12;y--;}S.y=y;S.m=m;charger();}
+$('prec').addEventListener('click',function(){mois(-1);});
+$('suiv').addEventListener('click',function(){mois(1);});
+$('grille').addEventListener('click',function(e){var b=e.target.closest('button[data-j]');if(!b)return;S.jour=b.dataset.j;S.cr=null;rendCal(false);rendCreneaux();if(window.innerWidth<=640)$('creneaux').scrollIntoView({behavior:'smooth',block:'start'});});
+$('creneaux').addEventListener('click',function(e){
+ var h=e.target.closest('button[data-c]');
+ if(h){S.cr={debut:h.dataset.c,label:h.dataset.l};rendCreneaux();return;}
+ if(e.target.closest('button[data-suivant]'))versForm();
+});
+
+/* ---------- formulaire ---------- */
+function versForm(){
+ var t=typeCfg();alerte('');
+ $('recap').innerHTML='<span>Le <b>'+libJour(S.jour)+'</b></span><span>à <b>'+S.cr.label+'</b></span><span><b>'+t.duree+' min</b> · visio</span>';
+ $('valider').textContent=S.remplace?'Confirmer le nouveau créneau':'Confirmer le rendez-vous';
+ if(S.info){if(!$('f-nom').value)$('f-nom').value=S.info.nom||'';if(!$('f-email').value)$('f-email').value=S.info.email||'';}
+ vue('form');setTimeout(function(){$('f-nom').focus();},50);
+}
+$('retour').addEventListener('click',function(){vue('cal');});
+$('form').addEventListener('submit',function(e){
+ e.preventDefault();alerte('');
+ var f=e.target,v=function(n){return (f.elements[n].value||'').trim();};
+ if(v('nom').length<2){alerte('Indiquez votre prénom et votre nom.');$('f-nom').focus();return;}
+ if(!/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(v('email'))){alerte('Cette adresse e-mail n’est pas valide.');$('f-email').focus();return;}
+ if(!$('f-cons').checked){alerte('Cochez la case d’accord pour confirmer le rendez-vous.');$('f-cons').focus();return;}
+ var b=$('valider');b.disabled=true;b.innerHTML='<span class="spin" aria-hidden="true"></span>Réservation en cours';
+ api('rdvReserver',{type:S.type,debut:S.cr.debut,nom:v('nom'),email:v('email'),telephone:v('telephone'),societe:v('societe'),effectif:v('effectif'),message:v('message'),consentement:true,site:v('site'),remplace:S.remplace})
+ .then(function(r){S.cache={};confirme(r);})
+ .catch(function(err){
+  b.disabled=false;b.textContent=S.remplace?'Confirmer le nouveau créneau':'Confirmer le rendez-vous';
+  if(err.code==='CRENEAU_PRIS'||/vient d.être pris/.test(err.message)){S.cache={};S.cr=null;vue('cal');charger();}
+  alerte(err.message);
+ });
+});
+function confirme(r){
+ $('okTitre').textContent=r.deplace?'Rendez-vous déplacé':'C’est confirmé';
+ $('okTxt').textContent='Une invitation Google Agenda et un e-mail de confirmation partent vers '+r.email+'. Vous recevrez un rappel la veille et une heure avant.';
+ var l=[['Quand',esc(r.quand)+' (heure de Paris)'],['Durée',r.duree+' minutes'],['Avec','Jamel Benaouidha, fondateur de DANRISE']];
+ if(r.meet)l.push(['Visio','<a href="'+esc(r.meet)+'" target="_blank" rel="noopener">'+esc(r.meet.replace(/^https:\/\//,''))+'</a>']);
+ $('okListe').innerHTML=l.map(function(x){return '<div><dt>'+x[0]+'</dt><b>'+x[1]+'</b></div>';}).join('');
+ $('okActions').innerHTML=(r.meet?'<a class="btn" href="'+esc(r.meet)+'" target="_blank" rel="noopener">Ouvrir le lien de la visio</a>':'')+'<button type="button" class="btn gh" id="encore">Réserver un autre créneau</button>';
+ S.remplace=null;S.info=null;$('deplace').hidden=true;
+ vue('ok');
+}
+$('okActions').addEventListener('click',function(e){if(e.target.id==='encore'){$('form').reset();S.cr=null;S.auto=true;rendHote();vue('cal');charger();}});
+
+/* ---------- gestion d'un rendez-vous (lien reçu par e-mail) ---------- */
+function gestion(){
+ vue('gestion');$('gTitre').textContent='Votre rendez-vous';$('gTxt').textContent='Chargement…';
+ api('rdvInfo',PARAMS.rdv,PARAMS.t).then(function(i){
+  S.info=i;
+  var actif=i.statut==='confirmé'&&!i.passe;
+  $('gTitre').textContent=actif?i.titre:(i.passe?'Ce rendez-vous est passé':'Ce rendez-vous n’est plus actif');
+  $('gTxt').textContent=actif?'Besoin de changer ? Choisissez un autre créneau ou annulez en un clic.':'Statut : '+i.statut+'. Vous pouvez réserver un nouveau créneau.';
+  var l=[['Quand',esc(i.quand)+' (heure de Paris)'],['Durée',i.duree+' minutes'],['Au nom de',esc(i.nom)]];
+  if(actif&&i.meet)l.push(['Visio','<a href="'+esc(i.meet)+'" target="_blank" rel="noopener">'+esc(i.meet.replace(/^https:\/\//,''))+'</a>']);
+  $('gListe').innerHTML=l.map(function(x){return '<div><dt>'+x[0]+'</dt><b>'+x[1]+'</b></div>';}).join('');
+  $('gActions').innerHTML=actif?'<button type="button" class="btn" id="gDeplacer">Choisir un autre créneau</button><button type="button" class="btn gh" id="gAnnuler">Annuler le rendez-vous</button>':'<button type="button" class="btn" id="gNouveau">Réserver un créneau</button>';
+ }).catch(function(e){$('gTitre').textContent='Lien non reconnu';$('gTxt').textContent=e.message;$('gActions').innerHTML='<button type="button" class="btn" id="gNouveau">Réserver un créneau</button>';});
+}
+$('gActions').addEventListener('click',function(e){
+ var id=e.target.id;
+ if(id==='gDeplacer'){S.remplace={id:PARAMS.rdv,jeton:PARAMS.t};S.type=S.info.type||S.type;$('deplace').textContent='Vous déplacez votre rendez-vous du '+S.info.quand+'. Il sera remplacé dès que vous confirmez le nouveau créneau.';$('deplace').hidden=false;$('calTitre').textContent='Choisissez votre nouveau créneau';rendHote();S.auto=true;vue('cal');charger();}
+ if(id==='gAnnuler'){$('gAnnul').hidden=false;$('g-motif').focus();}
+ if(id==='gNouveau'){S.info=null;rendHote();S.auto=true;vue('cal');charger();}
+});
+$('gNon').addEventListener('click',function(){$('gAnnul').hidden=true;});
+$('gOui').addEventListener('click',function(){
+ var b=$('gOui');b.disabled=true;b.textContent='Annulation…';
+ api('rdvAnnuler',PARAMS.rdv,PARAMS.t,$('g-motif').value).then(function(){
+  $('gAnnul').hidden=true;$('gTitre').textContent='Rendez-vous annulé';$('gTxt').textContent='C’est noté. Jamel est prévenu. Vous pouvez réserver un autre créneau quand vous voulez.';
+  $('gActions').innerHTML='<button type="button" class="btn" id="gNouveau">Réserver un créneau</button>';S.info=null;
+ }).catch(function(e){b.disabled=false;b.textContent='Confirmer l’annulation';alerte(e.message);});
+});
+
+/* ---------- démarrage ---------- */
+api('rdvConfig').then(function(c){
+ S.cfg=c;S.type=PARAMS.type&&c.types.some(function(t){return t.id===PARAMS.type;})?PARAMS.type:c.typeParDefaut;
+ var tz='';try{tz=Intl.DateTimeFormat().resolvedOptions().timeZone;}catch(e){}
+ if(tz&&tz!==c.fuseau)$('fuseauTxt').textContent='Heure de Paris (France). Vous êtes sur un autre fuseau : pensez au décalage.';
+ var cible=PARAMS.date&&PARAMS.date>=c.aujourdhui?PARAMS.date:c.aujourdhui,p=parts(cible);S.y=p[0];S.m=p[1];
+ rendHote();
+ if(PARAMS.rdv&&PARAMS.t)gestion();else{vue('cal');charger();}
+}).catch(function(e){alerte('La page de réservation ne répond pas pour le moment. Réessayez dans un instant. ('+e.message+')');});
+})();
+</script>
+</body>
+</html>
